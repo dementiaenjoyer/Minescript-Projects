@@ -2,11 +2,6 @@
 from kill_aura.imports import *;
 
 # Classes
-class Game:
-    @staticmethod
-    def tick():
-        return JavaTime.now().toEpochMilli();
-
 class Entities:
     @staticmethod
     def get(minecraft):
