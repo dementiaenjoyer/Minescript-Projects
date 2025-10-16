@@ -1,0 +1,72 @@
+# Imports
+from kill_aura.imports import *;
+
+# Classes
+class Game:
+    @staticmethod
+    def tick():
+        return JavaTime.now().toEpochMilli();
+
+class Entities:
+    @staticmethod
+    def get(minecraft):
+        level, local_player, entites = minecraft.level, minecraft.player, [];
+
+        if (not level):
+            return entites;
+    
+        for entity in level.entitiesForRendering():
+            if (entity == local_player):
+                continue;
+            
+            entites.append(MinecraftEntities(entity));
+
+        return entites;
+
+class MinecraftEntities:
+    def __init__(self, entity):
+        self.entity = entity;
+        self.unique_id = entity.getId();
+
+    def worthy(self, local_player):
+        entity = self.entity;
+
+        if (not entity) or local_player.distanceTo(entity) > 8.2:
+            return;
+
+        return (entity.isAlive()) and (entity.isAttackable()) and (not entity.isRemoved()) and (not entity.isInvisible()) and (entity.getName().toString() != "empty");
+
+class Events:
+    def register(self, name, callback):
+        ClientTickEvents.START_CLIENT_TICK.register(JavaClass("net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents$StartTick")(ManagedCallback(callback)));
+
+class Features:
+    def __init__(self):
+        self.attack_tick = -1;
+    
+    def update(self, minecraft):
+        time_stamp = Game.tick();
+
+        local_player = minecraft.player;
+        game_mode = minecraft.gameMode;
+
+        # comment these lines out if you don't want it to wait for the sweep cooldown
+        if (time_stamp - self.attack_tick <= ((local_player.getAttackStrengthScale(JavaFloat(0.5)) * 598.0))):
+            return;
+    
+        self.attack_tick = Game.tick();
+
+        for entity_object in Entities.get(minecraft):
+            entity = entity_object.entity;
+
+            if (not entity_object.worthy(local_player)):
+                continue;
+    
+            game_mode.attack(local_player, entity);
+            local_player.attack(entity);
+
+# Main
+EVENTS, FEATURES = Events(), Features();
+
+# Events
+EVENTS.register("Kill Aura", FEATURES.update);
