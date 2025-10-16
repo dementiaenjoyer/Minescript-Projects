@@ -36,34 +36,39 @@ class MinecraftEntities:
 
         return (entity.isAlive()) and (entity.isAttackable()) and (not entity.isRemoved()) and (not entity.isInvisible()) and (entity.getName().toString() != "empty");
 
+    def hostile(self):
+        entity = self.entity;
+        weapon = entity.getWeaponItem();
+
+        if (not weapon):
+            return;
+        
+        return weapon.has(DataComponents.WEAPON);
+
 class Events:
     def register(self, name, callback):
         ClientTickEvents.START_CLIENT_TICK.register(JavaClass("net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents$StartTick")(ManagedCallback(callback)));
 
 class Features:
-    def __init__(self):
-        self.attack_tick = -1;
-    
     def update(self, minecraft):
-        time_stamp = Game.tick();
-
         local_player = minecraft.player;
         game_mode = minecraft.gameMode;
 
-        # comment these lines out if you don't want it to wait for the sweep cooldown
-        if (time_stamp - self.attack_tick <= ((local_player.getAttackStrengthScale(JavaFloat(0.5)) * 598.0))):
+        if (not MinecraftEntities(local_player).hostile()):
             return;
     
-        self.attack_tick = Game.tick();
-
+        # comment these lines out if you don't want it to wait for the sweep cooldown
+        if (local_player.getAttackStrengthScale(JavaFloat(0.5)) != 1.0):
+            return;
+    
         for entity_object in Entities.get(minecraft):
             entity = entity_object.entity;
 
             if (not entity_object.worthy(local_player)):
                 continue;
     
-            game_mode.attack(local_player, entity);
             local_player.attack(entity);
+            game_mode.attack(local_player, entity);
 
 # Main
 EVENTS, FEATURES = Events(), Features();
