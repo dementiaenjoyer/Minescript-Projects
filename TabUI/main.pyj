@@ -1,0 +1,43 @@
+from TabUI.globals import *;
+
+# position_x = 10, position_y = 10, parent = None) | wouldnt recommedn changing parent, its for the tabs
+menu = MENU.Window();
+
+# usage
+def new_theme(state):
+    # the colors you can update: border, text, toggled, selected, background
+    menu.set_color("background", (state and argb.color(255, 47, 44, 53)) or argb.color(255, 32, 38, 46));
+
+# element with the default value of true! callback gets called upon the ui loading if the value is true, not only the state.
+menu.add_element("toggle", "we can have a toggle on the window", default = True, callback = lambda state: print("dsadas"));
+
+normal_tab, settings_tab = menu.add_element("tab", "or we can have a normal tab"), menu.add_element("tab", "settings!");
+normal_tab.add_element("tab", "omg... a tab inside of a tab... can we go deeper ?").add_element("toggle", "omg... a toggle inside of a tab inside of a tab inside of a tab, awesome !");
+
+toggle = normal_tab.add_element("toggle", "awesomeness toggle!");
+settings_tab.add_element("toggle", "new theme ?", callback = new_theme);
+
+cool_string, mpty = "awesome!", "";
+
+for index in range(len(cool_string)):
+    mpty += cool_string[index];
+
+    menu.add_element("toggle", mpty);
+
+# this is how you use flags:
+print(menu.get_flag("we can have a toggle on the window")["enabled"]);
+print(menu.get_flag("awesomeness toggle!")["enabled"]);
+
+# connections
+EVENT_MANAGER.register("main", menu.render);
+
+# up / down on the list
+KEYBINDS.down("DOWN", menu.down);
+KEYBINDS.down("UP", menu.up);
+
+# these are the interaction binds
+KEYBINDS.down("RIGHT", menu.right);
+
+# toggle menu / close tab
+KEYBINDS.down("LEFT", menu.left);
+KEYBINDS.down("INSERT", menu.toggle);
