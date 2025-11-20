@@ -101,7 +101,8 @@ class Window:
         elif (e_type == "function"):
             callback();
         elif (e_type == "tab"):
-            self.c_tab = e_data["tab"];
+            if ("tab" in e_data and e_data["tab"] is not None):
+                self.c_tab = e_data["tab"];
 
     def left(self):
         visible, active_tab, parent = self.visible, self.c_tab, self.parent;
