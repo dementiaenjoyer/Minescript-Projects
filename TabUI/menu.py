@@ -128,6 +128,20 @@ class Window:
             active_tab.toggle();
 
     def add_element(self, element, name, default = False, callback = None):
+        """
+        Used to add an element to an existing menu.
+
+        Args:
+            element (Literal["tab", "toggle", "function"]): Defines the object type. 
+                Use "tab" for a menu.
+            name (_type_): Text of the element.
+            default (bool, optional): Default value for a toggle. Defaults to False.
+            callback (_type_, optional): Required when the type is "function". Defaults to None.
+
+        Returns:
+            Optional[Window]: Returns the tab element if the type is "tab".
+        """
+
         data = {"name": name, "type": element, "enabled": default, "callback": callback};
         self.features.append(data);
         
