@@ -99,7 +99,8 @@ class Window:
                 if (callback):
                     callback(e_data["enabled"]);
         elif (e_type == "function"):
-            callback();
+            if (callback):
+                    callback();
         elif (e_type == "tab"):
             print(len(e_data["tab"].features))
             if ("tab" in e_data and len(e_data["tab"].features)):
