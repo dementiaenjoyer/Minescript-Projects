@@ -102,7 +102,6 @@ class Window:
             if (callback):
                     callback();
         elif (e_type == "tab"):
-            print(len(e_data["tab"].features))
             if ("tab" in e_data and len(e_data["tab"].features)):
                 self.c_tab = e_data["tab"];
 
