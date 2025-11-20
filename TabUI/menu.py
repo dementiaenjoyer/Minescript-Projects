@@ -135,8 +135,12 @@ class Window:
         Used to add an element to an existing menu.
 
         Args:
-            element (Literal["tab", "toggle", "function"]): Defines the object type. 
-                Use "tab" for a menu.
+            element (Literal["tab", "toggle", "function", "info"]): Defines the object type. 
+               - Use "tab" for a menu.
+               - Use "toggle" for a toggle element, use right arrow to toggle it, call a callback (if given)
+                             when the toggle value is set to true
+               - Use "function" for a simple element that call a callback (if given) when the right arrow is used on it
+               - Use "info" for a simple element with no other effect
             name (_type_): Text of the element.
             default (bool, optional): Default value for a toggle. Defaults to False.
             callback (_type_, optional): Required when the type is "function". Defaults to None.
