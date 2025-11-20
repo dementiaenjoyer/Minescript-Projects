@@ -101,7 +101,8 @@ class Window:
         elif (e_type == "function"):
             callback();
         elif (e_type == "tab"):
-            if ("tab" in e_data and len(e_data["tab"])):
+            print(len(e_data["tab"].features))
+            if ("tab" in e_data and len(e_data["tab"].features)):
                 self.c_tab = e_data["tab"];
 
     def left(self):
