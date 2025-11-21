@@ -95,11 +95,14 @@ class Window:
         
         if (e_type == "toggle"):
             e_data["enabled"] = not e_data["enabled"];
-
             if (callback):
                 callback(e_data["enabled"]);
+        elif (e_type == "function"):
+            if (callback):
+                    callback();
         elif (e_type == "tab"):
-            self.c_tab = e_data["tab"];
+            if ("tab" in e_data and len(e_data["tab"].features)):
+                self.c_tab = e_data["tab"];
 
     def left(self):
         visible, active_tab, parent = self.visible, self.c_tab, self.parent;
@@ -126,6 +129,26 @@ class Window:
             active_tab.toggle();
 
     def add_element(self, element, name, default = False, callback = None):
+        """
+        Used to add an element to an existing menu.
+
+        Args:
+            element (Literal["tab", "toggle", "function", "info"]): Defines the object type.
+                - "tab": Creates a submenu.
+                - "toggle": Creates a toggle element. Pressing the right arrow toggles its value and triggers the callback (if provided).
+                - "function": Creates a simple action element. Pressing the right arrow runs the callback (if provided).
+                - "info": Creates a simple display-only element with no interaction.
+            name (_type_): Text of the element.
+            default (bool, optional): Default toggle value. Defaults to False.
+            callback (_type_, optional): Callback function.
+                - For "toggle", the callback receives the new toggle value.
+                - For "function", the callback is executed every time the right arrow is pressed.
+                - For any other element type, the callback is ignored.
+
+        Returns:
+            Optional[Window]: The newly created tab window when the element type is "tab".
+        """
+
         data = {"name": name, "type": element, "enabled": default, "callback": callback};
         self.features.append(data);
         

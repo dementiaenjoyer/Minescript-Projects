@@ -11,6 +11,9 @@ def new_theme(state):
 # element with the default value of true! callback gets called upon the ui loading if the value is true, not only the state.
 menu.add_element("toggle", "we can have a toggle on the window", default = True, callback = lambda state: print("dsadas"));
 
+
+menu.add_element("function", "or just to launch a function", callback = lambda: print("I am a function !"));
+
 normal_tab, settings_tab = menu.add_element("tab", "or we can have a normal tab"), menu.add_element("tab", "settings!");
 normal_tab.add_element("tab", "omg... a tab inside of a tab... can we go deeper ?").add_element("toggle", "omg... a toggle inside of a tab inside of a tab inside of a tab, awesome !");
 
