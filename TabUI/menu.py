@@ -95,9 +95,8 @@ class Window:
         
         if (e_type == "toggle"):
             e_data["enabled"] = not e_data["enabled"];
-            if (e_data["enabled"]):
-                if (callback):
-                    callback(e_data["enabled"]);
+            if (callback):
+                callback(e_data["enabled"]);
         elif (e_type == "function"):
             if (callback):
                     callback();
