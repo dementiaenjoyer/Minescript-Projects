@@ -134,18 +134,20 @@ class Window:
         Used to add an element to an existing menu.
 
         Args:
-            element (Literal["tab", "toggle", "function", "info"]): Defines the object type. 
-               - Use "tab" for a menu.
-               - Use "toggle" for a toggle element, use right arrow to toggle it, call a callback (if given)
-                             when the toggle value is set to true
-               - Use "function" for a simple element that call a callback (if given) when the right arrow is used on it
-               - Use "info" for a simple element with no other effect
+            element (Literal["tab", "toggle", "function", "info"]): Defines the object type.
+                - "tab": Creates a submenu.
+                - "toggle": Creates a toggle element. Pressing the right arrow toggles its value and triggers the callback (if provided).
+                - "function": Creates a simple action element. Pressing the right arrow runs the callback (if provided).
+                - "info": Creates a simple display-only element with no interaction.
             name (_type_): Text of the element.
-            default (bool, optional): Default value for a toggle. Defaults to False.
-            callback (_type_, optional): Required when the type is "function". Defaults to None.
+            default (bool, optional): Default toggle value. Defaults to False.
+            callback (_type_, optional): Callback function.
+                - For "toggle", the callback receives the new toggle value.
+                - For "function", the callback is executed every time the right arrow is pressed.
+                - For any other element type, the callback is ignored.
 
         Returns:
-            Optional[Window]: Returns the tab element if the type is "tab".
+            Optional[Window]: The newly created tab window when the element type is "tab".
         """
 
         data = {"name": name, "type": element, "enabled": default, "callback": callback};
