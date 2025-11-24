@@ -168,11 +168,8 @@ class Window:
 
     def get_flag(self, name):
         for feature in self.features:
-            if (feature["name"] == name and feature["type"] == "toggle"):
+            if (feature["name"] == name and feature["type"] != "tab"):
                 return feature;
-    
-            if (feature["type"] != "tab"):
-                continue;
     
             result = feature["tab"].get_flag(name);
     
