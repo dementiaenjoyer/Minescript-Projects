@@ -130,6 +130,9 @@ class KEYBIND_CLASS: # i made this because add_event_listener causes INSANE amou
         for name in events:
             code = self.keys.get(name);
             
+            if (str(screen_name()) == "Chat screen"):
+                continue;
+            
             if (not code):
                 continue;
             
