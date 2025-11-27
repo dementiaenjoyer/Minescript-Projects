@@ -175,3 +175,39 @@ def HUD_RENDER(draw_context, _):
 
 hud_render_callback.EVENT.register(hud_render_callback(ManagedCallback(HUD_RENDER)));
 world_render_events.LAST.register(world_render_last(KEYBINDS.on_update));
+
+# Tracks whether we *think* the inventory is open because of an input field
+INPUT_INVENTORY_OPEN = False;      # just for info, if you care
+INPUT_INVENTORY_LOCKED = False;    # when True, we won't auto-open inventory for the current input selection
+LAST_SCREEN_NAME = None;
+
+
+def open_inventory_gui():
+    """
+    Open the player's inventory screen.
+
+    You must implement this using the Minecraft Java class.
+    Example in Java (1.19+ style):
+        Minecraft mc = Minecraft.getInstance();
+        mc.setScreen(new InventoryScreen(mc.player));
+    """
+    press_key_bind("key.inventory", True)
+    press_key_bind("key.inventory", False)
+    pass;
+
+def _get_active_window(menu):
+    """
+    Go down into the currently active tab chain to get the deepest window.
+    """
+    win = menu;
+    while win.c_tab:
+        win = win.c_tab;
+    return win;
+
+def is_input_selected(menu):
+    """
+    Returns True if, in the active window, the selected feature is of type "input".
+    """
+    win = _get_active_window(menu);
+    feature = win._get_selected_feature();
+    return (feature is not None) and (feature["type"] == "input");

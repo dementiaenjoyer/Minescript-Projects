@@ -1,4 +1,5 @@
-import TabUI.globals as essentials;
+import TabUI.globals as essentials
+from system.pyj.minescript import press_key_bind;
 
 class Window:
     def __init__(self, position_x = 10, position_y = 10, parent = None):
@@ -22,6 +23,17 @@ class Window:
         
         if (parent):
             self.colors = parent.colors;
+    
+    def _get_selected_feature(self):
+        if (not self.features):
+            return None;
+        
+        index = self.index;
+        if (index < 0 or index >= len(self.features)):
+            return None;
+        
+        return self.features[index];
+
 
     def render(self, draw_context):
         visible, active_tab = self.visible, self.c_tab;
@@ -53,6 +65,13 @@ class Window:
         
         if (active_tab):
             active_tab.render(draw_context);
+
+    def handle_inv_input(self, _):
+        
+        # print(self._get_selected_feature())
+        if essentials.is_input_selected(self):
+            press_key_bind("key.inventory", True)
+            press_key_bind("key.inventory", False)
 
     def down(self):
         visible, active_tab = self.visible, self.c_tab;
@@ -133,16 +152,21 @@ class Window:
         Used to add an element to an existing menu.
 
         Args:
-            element (Literal["tab", "toggle", "function", "info"]): Defines the object type.
+            element (Literal["tab", "toggle", "function", "info", "input"]): Defines the object type.
                 - "tab": Creates a submenu.
                 - "toggle": Creates a toggle element. Pressing the right arrow toggles its value and triggers the callback (if provided).
                 - "function": Creates a simple action element. Pressing the right arrow runs the callback (if provided).
                 - "info": Creates a simple display-only element with no interaction.
+                - "input": Creates a text input element. When selected, typed characters modify its name.
+                            Pressing ENTER triggers the callback with the current text as parameter.
             name (_type_): Text of the element.
-            default (bool, optional): Default toggle value. Defaults to False.
+            default (bool, optional):
+                - For "toggle": default toggle value. Defaults to False.
+                - For "input": ignored.
             callback (_type_, optional): Callback function.
                 - For "toggle", the callback receives the new toggle value.
                 - For "function", the callback is executed every time the right arrow is pressed.
+                - For "input", the callback is executed when ENTER is pressed and receives the current text.
                 - For any other element type, the callback is ignored.
 
         Returns:
@@ -171,8 +195,11 @@ class Window:
             if (feature["name"] == name and feature["type"] != "tab"):
                 return feature;
     
+            if (feature["type"] != "tab"):
+                continue;
+
             result = feature["tab"].get_flag(name);
-    
+            
             if (result):
                 return result;
 
@@ -185,3 +212,73 @@ class Window:
         
         if (active_tab):
             active_tab.set_color(color_type, color);
+    
+    def handle_key(self, key_name):
+        """
+        Handle non-character keys (arrows, ENTER, BACKSPACE...).
+
+        key_name is a string like "UP", "DOWN", "LEFT", "RIGHT", "ENTER", "BACKSPACE".
+        """
+        visible, active_tab = self.visible, self.c_tab;
+        
+        if (not visible):
+            return;
+        
+        # If we are inside a sub-tab, delegate to it
+        if (active_tab):
+            return active_tab.handle_key(key_name);
+        
+        feature = self._get_selected_feature();
+        
+        # Arrow keys must always behave like before
+        if (key_name == "UP"):
+            return self.up();
+        if (key_name == "DOWN"):
+            return self.down();
+        if (key_name == "LEFT"):
+            return self.left();
+        if (key_name == "RIGHT"):
+            return self.right();
+        
+        # For non-input elements, ENTER should behave like RIGHT (i.e., toggle/function/tab)
+        if (not feature or feature["type"] != "input"):
+            return;
+        
+        # === We are on an "input" element from here ===
+        if (key_name == "BACKSPACE"):
+            current = feature["name"];
+            if (current):
+                feature["name"] = current[:-1];
+        
+        elif (key_name == "ENTER"):
+            # Trigger callback with the current text
+            callback = feature.get("callback");
+            if (callback):
+                callback(feature["name"]);
+    
+    def handle_char(self, char):
+        """
+        Handle a typed printable character (letters, numbers, space, etc.).
+        """
+        visible, active_tab = self.visible, self.c_tab;
+        
+        if (not visible):
+            return;
+        
+        # If we are inside a sub-tab, delegate to it
+        if (active_tab):
+            return active_tab.handle_char(char);
+        
+        feature = self._get_selected_feature();
+        
+        if (not feature or feature["type"] != "input"):
+            # If the current element is not an input, ignore characters
+            return;
+        
+        # Avoid weird control characters
+        if (not char or char == "\n" or char == "\r"):
+            return;
+        
+        # Append the character to the element name
+        feature["name"] = (feature["name"] or "") + char;
+
