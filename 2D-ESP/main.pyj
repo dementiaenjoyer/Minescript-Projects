@@ -1,0 +1,70 @@
+from ESP.globals import *;
+
+def render(draw_context):
+    draw = DRAWING.new;
+
+    level = MINECRAFT.level;
+    player = MINECRAFT.player;
+    game_renderer = MINECRAFT.gameRenderer;
+
+    camera_position = game_renderer.getMainCamera().getPosition();
+
+    for entity in level.players():
+        if (entity == player):
+            continue;
+        
+        position = entity.getEyePosition(0.0);
+        distance = camera_position.distanceTo(position);
+
+        name = entity.getName().getString(); # already a component
+
+        # profile = entity.getGameProfile();
+        # name = profile.getName();
+
+        if (distance > 50) or (entity.isDeadOrDying()) or (entity.isSpectator()) or (name == "empty"):
+            continue;
+        
+        w2s = MATH.world_to_screen(game_renderer, vector3(position.x, position.y - (entity.getEyeHeight() * 0.5), position.z));
+
+        if (not w2s):
+            continue;
+
+        bb_width, bb_height = entity.getBbWidth(), entity.getBbHeight();
+        size = MATH.get_screen_scale(camera_position, position, bb_width, bb_height, player);
+
+        x, y = size.x, size.y;
+        half_x, half_y = (x * 0.5), (y * 0.5);
+
+        left, right = w2s.x - half_x, w2s.x + half_x;
+        top, bottom = w2s.y - half_y, w2s.y + half_y;
+
+        # box
+        draw("rect", draw_context, left - 1, top - 1, right + 1, bottom + 1, OUTLINE);
+        draw("rect", draw_context, left, top, right, bottom, WHITE);
+        draw("rect", draw_context, left + 1, top + 1, right - 1, bottom - 1, OUTLINE);
+
+        # healthbar
+        health, max_health = entity.getHealth(), entity.getMaxHealth();
+        ratio = health * (max_health * 0.0025);
+        height = (ratio * (bottom - top));
+
+        start, end = (left - 4), (left - 3);
+
+        draw("filled_rect", draw_context, start - 1, top - 1, end + 1, bottom + 1, OUTLINE);
+        draw("filled_rect", draw_context, start, bottom - height, end, bottom, argb.color(255, 0, 255, 0));
+
+        text = str(int(health * 5));
+        draw("outline_text", draw_context, text, (start - FONT.width(text)) - 2, bottom - height, WHITE);
+
+        # name
+        base = (left + (right - left) * 0.5);
+        draw("outline_text", draw_context, name, base - (FONT.width(name) * 0.5), top - 10, WHITE);
+        
+        # weapon
+        weapon = entity.getMainHandItem().getItemName().getString();
+        formatted = (weapon == "Air" and "None") or weapon;
+        
+        draw("outline_text", draw_context, formatted, base - (FONT.width(formatted) * 0.5), bottom + 2, WHITE);
+
+EVENT_MANAGER.register("ESP", render);
+# resource_location.fromNamespaceAndPath("esp", "fonts/font.json");
