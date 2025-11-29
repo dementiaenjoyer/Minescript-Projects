@@ -16,7 +16,7 @@ def render(draw_context):
         position = entity.getEyePosition(0.0);
         distance = camera_position.distanceTo(position);
 
-        name = entity.getName().getString(); # already a component
+        name = entity.getName().getString();
 
         # profile = entity.getGameProfile();
         # name = profile.getName();
