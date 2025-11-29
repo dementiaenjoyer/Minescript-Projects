@@ -1,10 +1,10 @@
 from ESP.imports import *;
 
+PURPLE = argb.color(255, 115, 100, 148);
 WHITE = argb.color(255, 255, 255, 255);
 RED = argb.color(255, 255, 0, 0);
 OUTLINE = argb.color(255, 0, 0, 0);
-PURPLE = argb.color(255, 115, 100, 148);
-# FLAG = style();
+FLAGS = style.EMPTY.withShadowColor(0xFFFFFF);
 
 """
 @Nullable TextColor textColor,
