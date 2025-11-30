@@ -10,8 +10,8 @@ def render(draw_context):
     camera_position = game_renderer.getMainCamera().getPosition();
 
     for entity in level.players():
-        # if (entity == player):
-        #     continue;
+        if (entity == player):
+            continue;
         
         position = entity.getEyePosition(2);
         distance = camera_position.distanceTo(position);
