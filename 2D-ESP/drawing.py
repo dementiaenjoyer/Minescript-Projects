@@ -20,10 +20,10 @@ def filled_rect(draw_context, start_x, start_y, end_x, end_y, color):
     draw_context.fill(start_x, start_y, end_x, end_y, color);
 
 def filled_gradient(draw_context, start_x, start_y, end_x, end_y, upper, lower):
-    start_x, start_y = int(start_x), int(start_y)
-    end_x, end_y = int(end_x), int(end_y)
+    start_x, start_y = int(start_x), int(start_y);
+    end_x, end_y = int(end_x), int(end_y);
 
-    draw_context.fillGradient(start_x, start_y, end_x, end_y, upper, lower)
+    draw_context.fillGradient(start_x, start_y, end_x, end_y, upper, lower);
 
 def rect(draw_context, start_x, start_y, end_x, end_y, color):
     filled_rect(draw_context, start_x, start_y, end_x, start_y + 1, color);
