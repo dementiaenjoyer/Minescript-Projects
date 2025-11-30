@@ -19,6 +19,12 @@ def filled_rect(draw_context, start_x, start_y, end_x, end_y, color):
     
     draw_context.fill(start_x, start_y, end_x, end_y, color);
 
+def filled_gradient(draw_context, start_x, start_y, end_x, end_y, upper, lower):
+    start_x, start_y = int(start_x), int(start_y)
+    end_x, end_y = int(end_x), int(end_y)
+
+    draw_context.fillGradient(start_x, start_y, end_x, end_y, upper, lower)
+
 def rect(draw_context, start_x, start_y, end_x, end_y, color):
     filled_rect(draw_context, start_x, start_y, end_x, start_y + 1, color);
     filled_rect(draw_context, start_x, end_y - 1, end_x, end_y, color);
@@ -33,4 +39,4 @@ def new(draw_type, *args):
 
     return callbacks[draw_type](*args);
 
-callbacks = {"outline_text": outline_text, "text": text, "filled_rect": filled_rect, "rect": rect};
+callbacks = {"outline_text": outline_text, "text": text, "filled_rect": filled_rect, "filled_gradient": filled_gradient, "rect": rect};
