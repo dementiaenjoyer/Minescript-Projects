@@ -2,7 +2,7 @@ import TabUI.globals as essentials
 from system.pyj.minescript import press_key_bind;
 
 class Window:
-    def __init__(self, position_x = 10, position_y = 10, parent = None):
+    def __init__(self, position_x = 10, position_y = 10, parent = None, colors = {}):
         self.features = [ ];
         
         self.visible = True;
@@ -20,6 +20,9 @@ class Window:
             "toggled": essentials.argb.color(255, 98, 160, 110),
             "selected": essentials.argb.color(120, 57, 62, 69)
         };
+        
+        for i in colors:
+            self.colors[i] = colors[i]
         
         if (parent):
             self.colors = parent.colors;
@@ -53,13 +56,24 @@ class Window:
         draw("filled_rect", draw_context, position_x, position_y, position_x + width, position_y + height, background);
         
         for index, feature in enumerate(self.features):
+            feature_color = feature["colors"]
+            
+            feature_background = background if "background" not in feature_color else feature_color["background"]
+            feature_selected = selected if "selected" not in feature_color else feature_color["selected"]
+            feature_toggled = toggled if "toggled" not in feature_color else feature_color["toggled"]
+            feature_text = colors["text"] if "text" not in feature_color else feature_color["text"]
+            
+            
+            
             bb = index * e_height;
             feature_y = position_y + 1 + bb;
             
-            if (index == tab_index and not active_tab):                
-                draw("filled_rect", draw_context, position_x + 1, feature_y, position_x + width - 1, feature_y + e_height, selected);
+            draw("filled_rect", draw_context, position_x + 1, feature_y, position_x + width - 1, feature_y + e_height, feature_background);
             
-            draw("text", draw_context, feature["name"], position_x + 5, feature_y + (e_height - font.lineHeight) / 2, toggled if (feature["enabled"]) else colors["text"]);
+            if (index == tab_index and not active_tab):              
+                draw("filled_rect", draw_context, position_x + 1, feature_y, position_x + width - 1, feature_y + e_height, feature_selected);
+            
+            draw("text", draw_context, feature["name"], position_x + 5, feature_y + (e_height - font.lineHeight) / 2, feature_toggled if (feature["enabled"]) else feature_text);
         
         draw("rect", draw_context, position_x, position_y, position_x + width, position_y + height, border);
         
@@ -147,7 +161,7 @@ class Window:
         if (active_tab):
             active_tab.toggle();
 
-    def add_element(self, element, name, default = False, callback = None):
+    def add_element(self, element, name, default = False, callback = None, colors = {}):
         """
         Used to add an element to an existing menu.
 
@@ -173,11 +187,11 @@ class Window:
             Optional[Window]: The newly created tab window when the element type is "tab".
         """
 
-        data = {"name": name, "type": element, "enabled": default, "callback": callback};
+        data = {"name": name, "type": element, "enabled": default, "callback": callback, "colors": colors};
         self.features.append(data);
         
         if (element == "tab"):
-            new_tab = Window(self.position.x + self.get_width() + 2, self.position.y, self);
+            new_tab = Window(self.position.x + self.get_width() + 2, self.position.y, self, colors);
             data["tab"] = new_tab;
 
             return new_tab;
