@@ -1,0 +1,71 @@
+from ESP.globals import EVENT_MANAGER, DRAWING, MINECRAFT, WHITE, OUTLINE, MATH, FONT, FLAGS, ARGB, JavaFloat, JavaVector3, Component, StringDecomposer;
+
+def render(draw_context):
+    draw = DRAWING.new;
+
+    level = MINECRAFT.level;
+    player = MINECRAFT.player;
+    game_renderer = MINECRAFT.gameRenderer;
+
+    camera = game_renderer.getMainCamera();
+    client = camera.getPosition();
+
+    for entity in level.players():
+        if (entity == player):
+            continue;
+        
+        position = entity.getEyePosition(1.5);
+        distance = client.distanceTo(position);
+
+        name = StringDecomposer.getPlainText(entity.getName());
+
+        if (distance > 50) or (entity.isDeadOrDying()) or (entity.isSpectator()) or (name == "empty"):
+            continue;
+        
+        w2s = MATH.world_to_screen(game_renderer, JavaVector3(position.x, position.y - (entity.getEyeHeight() * 0.5), position.z));
+        size = w2s and MATH.get_screen_scale(client, position, entity.getBbWidth(), entity.getBbHeight(), player);
+
+        if (not size):
+            continue;
+
+        x, y = size.x, size.y;
+        w2s_x, w2s_y = w2s.x, w2s.y;
+
+        half_x, half_y = (x * 0.5), (y * 0.5);
+
+        left, right = JavaFloat(int(w2s_x - half_x)), JavaFloat(int(w2s_x + half_x));
+        top, bottom = JavaFloat(int(w2s_y - half_y)), JavaFloat(int(w2s_y + half_y));
+
+        bottom_a1 = JavaFloat(int(bottom + 1));
+        bottom_n1 = JavaFloat(int(bottom - 1));
+
+        # box
+        draw("rect", draw_context, JavaFloat(int(left - 1)), JavaFloat(int(top - 1)), JavaFloat(int(right + 1)), bottom_a1, OUTLINE);
+        draw("rect", draw_context, left, top, right, bottom, WHITE);
+        draw("rect", draw_context, JavaFloat(int(left + 1)), JavaFloat(int(top + 1)), JavaFloat(int(right - 1)), bottom_n1, OUTLINE);
+    
+        # healthbar
+        health, max_health = entity.getHealth(), entity.getMaxHealth();
+
+        ratio = health * (max_health * 0.0025);
+        height = (ratio * (bottom - top));
+
+        start, end = (left - 4), (left - 3);
+
+        draw("filled_rect", draw_context, start - 1, top - 1, end + 1, bottom + 1, OUTLINE)
+        draw("filled_gradient", draw_context, start, bottom - height, end, bottom, ARGB.color(255, int(255 - (ratio * 255)), int(ratio * 255), 0), ARGB.color(255, 255, 0, 0));
+
+        text = str(int(health * 5));
+        draw("outline_text", draw_context, Component.literal(text).withStyle(FLAGS), (start - FONT.width(text)) - 2, bottom - height, WHITE);
+
+        # name
+        base = (left + (right - left) * 0.5);
+        draw("outline_text", draw_context, Component.literal(name).withStyle(FLAGS), base - (FONT.width(name) * 0.5), top - 10, WHITE);
+        
+        # weapon
+        weapon = entity.getMainHandItem().getItemName().getString();
+        formatted = (weapon == "Air" and "None") or weapon;
+        
+        draw("outline_text", draw_context, Component.literal(formatted).withStyle(FLAGS), base - (FONT.width(formatted) * 0.5), bottom + 2.1, WHITE);
+
+EVENT_MANAGER.register("ESP", render);
