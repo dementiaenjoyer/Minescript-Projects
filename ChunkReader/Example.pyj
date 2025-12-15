@@ -1,0 +1,5 @@
+from ChunkReader.Main import Getter, Blocks;
+ChunkReader = Getter();
+
+print(ChunkReader.GetBlocks(BlockType = Blocks.DEEPSLATE)); # returns max 100 block positions (auto limited)
+print(ChunkReader.GetBlocks(BlockType = Blocks.DIAMOND_BLOCK, MaxBlocks = 5)); # returns max 5 block positions
