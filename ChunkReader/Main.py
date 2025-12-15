@@ -2,8 +2,7 @@
 I usually only use PascalCase for classes, but i ended up writing this entire thing
 in PascalCase just because there's nothing else to add really, and i wasn't sure whether to use snake_case or not
 
-Feel free to change stuff such as the amount of iterations for the chunk sections,
-we only go through 512 blocks per chunk section for less of a performance decrease
+Feel free to change stuff such as the amount of iterations for the chunk sections, may drop a lot of fps currently.
 """
 
 # Imports
@@ -72,7 +71,7 @@ class Getter:
         
                 BaseY = Key * 16 - 63;
         
-                for Step in range(0, 512): # BitStorage.getSize() = (16 ^ 3), read comment at the top on why we only iter 512 times
+                for Step in range(4096): # BitStorage.getSize() = (16 ^ 3)
                     if (Palette.valueFor(BitStorage.get(Step)).getBlock() != BlockType):
                         continue;
                                         
