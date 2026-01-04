@@ -1,0 +1,66 @@
+from TabUI.Other.bundled import ( Window, ARGB, EVENT_MANAGER, KEYBINDS );
+
+# PositionX = 10, PositionY = 10, Parent = None) | wouldnt recommedn changing parent, its for the tabs
+menu = Window();
+
+# usage
+def new_theme(state):
+    # the colors you can update: border, text, toggled, selected, background
+    menu.SetColor("background", (state and ARGB.color(255, 47, 44, 53)) or ARGB.color(255, 32, 38, 46));
+
+# element with the default value of true! callback gets called upon the ui loading if the value is true, not only the state.
+menu.AddElement("toggle", "we can have a toggle on the window", Default = True, Callback = lambda _: print("dsadas"));
+label = menu.AddElement("label", "non interactable label !");
+
+# you can only update the text of labels as of right now, nothing else
+def new_label():
+    label["update"]("new text for the label!");
+
+menu.AddElement("button", "button which makes a notification!", Callback = lambda: menu.Notify("notification !"));
+menu.AddElement("button", "update label text", Callback = new_label);
+
+normal_tab, settings_tab = menu.AddElement("tab", "or we can have a normal tab"), menu.AddElement("tab", "settings!");
+normal_tab.AddElement("tab", "omg... a tab inside of a tab... can we go deeper ?").AddElement("toggle", "omg... a toggle inside of a tab inside of a tab inside of a tab, awesome !");
+
+toggle = normal_tab.AddElement("toggle", "awesomeness toggle!");
+settings_tab.AddElement("toggle", "new theme ?", Callback = new_theme);
+
+cool_string, mpty = "awesome!", "";
+
+for index in range(len(cool_string)):
+    mpty += cool_string[index];
+
+    menu.AddElement("toggle", mpty);
+
+for index in range(6):
+    menu.Notify(f"notification ! {index+1}");
+
+# this is how you use flags:
+print(menu.GetFlag("we can have a toggle on the window")["enabled"]);
+print(menu.GetFlag("awesomeness toggle!")["enabled"]);
+
+# connections
+EVENT_MANAGER.Register("main", menu.Render);
+
+# up / down on the list
+KEYBINDS.Down("DOWN", menu.Down);
+KEYBINDS.Down("UP", menu.Up);
+
+# these are the interaction binds
+KEYBINDS.Down("RIGHT", menu.Right);
+
+# toggle menu / close tab
+KEYBINDS.Down("LEFT", menu.Left);
+KEYBINDS.Down("INSERT", menu.Toggle);
+
+# resize
+def scale_up():
+    menu.Notify("increased scale of menu");
+    menu.SetScale(menu.ElementHeight + 1);
+
+def scale_down():
+    menu.Notify("decreased scale of menu");
+    menu.SetScale(menu.ElementHeight - 1);
+
+KEYBINDS.Down("DELETE", scale_up);
+KEYBINDS.Down("END", scale_down);
