@@ -1,5 +1,10 @@
 from ChunkReader.Main import Getter, Blocks;
 ChunkReader = Getter();
 
-print(ChunkReader.GetBlocks(BlockType = Blocks.DEEPSLATE)); # returns max 100 block positions (auto limited)
-print(ChunkReader.GetBlocks(BlockType = Blocks.DIAMOND_BLOCK, MaxBlocks = 5)); # returns max 5 block positions
+DiamondBlock = ChunkReader.GetBlocks(BlockType = Blocks.DIAMOND_BLOCK); # # returns max 100 block positions (auto limited)
+Deepslate = ChunkReader.GetBlocks(BlockType = Blocks.DEEPSLATE, MaxBlocks = 5); # returns max 5 block positions
+Furnace = ChunkReader.GetBlocks(BlockType = Blocks.FURNACE, ExitIfExists = True); # returns the chunk positions, not block positions (fast)
+
+print(DiamondBlock);
+print(Deepslate);
+print(Furnace); 
