@@ -1,20 +1,10 @@
-"""
-I usually only use PascalCase for classes, but i ended up writing this entire thing
-in PascalCase just because there's nothing else to add really, and i wasn't sure whether to use snake_case or not
-
-Feel free to change stuff such as the amount of iterations for the chunk sections, may drop a lot of fps currently.
-"""
-
-# Imports
 from system.pyj.minescript import *;
 
-# Game Classes
 Blocks = JavaClass("net.minecraft.world.level.block.Blocks");
 Minecraft = JavaClass("net.minecraft.client.Minecraft");
 Predicate = JavaClass("java.util.function.Predicate");
 Field = JavaClass("java.lang.reflect.Field");
 
-# Python Classes
 class Reflection:
     Cache = { };
 
@@ -34,8 +24,10 @@ class Getter:
     def __init__(self):
         self.Minecraft = Minecraft.getInstance();
 
-    def GetBlocks(self, BlockType, MaxBlocks = 100):
+    def GetBlocks(self, BlockType, MaxBlocks = 100, ExitIfExists = False):
         Locations = [ ];
+        CachedChunks = [ ];
+
         Collected = 0;
 
         Instance = self.Minecraft;
@@ -61,7 +53,18 @@ class Getter:
                 
                 States = Section.getStates();
         
-                if (not States.maybeHas(Predicate(lambda BlockState: BlockState.getBlock() == BlockType))): # thank god minecraft has this, otherwise this would be running at 0.5 fps
+                if (not States.maybeHas(Predicate(lambda BlockState: BlockState.getBlock() == BlockType))):
+                    continue;
+
+                if (ExitIfExists):
+                    Position = (ChunkX, ChunkZ);
+
+                    if (Position in CachedChunks): # so we dont store the same chunk multiple times
+                        continue;
+
+                    CachedChunks.append(Position);
+                    Locations.append((ChunkX * 16 + 8, 120, ChunkZ * 16 + 8));
+
                     continue;
                                 
                 Data = Reflection.GetField(States, "field_34560");
@@ -71,7 +74,7 @@ class Getter:
         
                 BaseY = Key * 16 - 63;
         
-                for Step in range(4096): # BitStorage.getSize() = (16 ^ 3)
+                for Step in range(4096): # BitStorage.getSize() or (16 ^ 3)
                     if (Palette.valueFor(BitStorage.get(Step)).getBlock() != BlockType):
                         continue;
                                         
