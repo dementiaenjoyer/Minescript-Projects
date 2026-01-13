@@ -165,11 +165,11 @@ class KEYBIND_CLASS: # i made this because add_event_listener causes INSANE amou
 
             Previous[Code] = State;
 
-    def Up(Self, key, Callback):
-        if (key not in Self.Events):
-            Self.Events[key] = { };
+    def Up(Self, Key, Callback):
+        if (Key not in Self.Events):
+            Self.Events[Key] = { };
 
-        Self.Events[key]["up"] = Callback;
+        Self.Events[Key]["up"] = Callback;
 
     def Down(Self, Key, Callback):
         if (Key not in Self.Events):
@@ -373,13 +373,26 @@ class Window:
         
         if (ActiveTab):
             ActiveTab.Toggle();
+    
+    def UpdateTabs(Self):
+        Width = Self.GetWidth();
+        PositionX, PositionY = Self.Position.x, Self.Position.y;
 
-    def AddElement(self, Element, Name, Default = False, Callback = None, Flag = None):
+        for Index, Feature in enumerate(Self.Features):
+            if (Feature["type"] != "tab"):
+                continue;
+
+            TabWindow = Feature["tab"];
+            
+            TabWindow.Position = Vector2(JavaFloat(PositionX + Width + 2), JavaFloat(PositionY + Self.GetPadding(Index)));
+            TabWindow.UpdateTabs();
+
+    def AddElement(Self, Element, Name, Default = False, Callback = None, Flag = None):
         if (not Flag):
             Flag = Name;
 
         Data = { "name": Name, "type": Element, "enabled": Default, "callback": Callback, "flag": Flag };
-        self.Features.append(Data);
+        Self.Features.append(Data);
         
         if (Element == "label"):
             def UpdateText(txt):
@@ -388,24 +401,30 @@ class Window:
             UpdateText(Name);
             Data["update"] = UpdateText;
 
+            Self.UpdateTabs();
+
             return Data;
         
         if (Element == "tab"):
-            NewTab = Window(self.Position.x + (self.GetWidth() + 2), self.Position.y + self.GetPadding(len(self.Features) - 1), self);
+            NewTab = Window(Self.Position.x + (Self.GetWidth() + 2), Self.Position.y + Self.GetPadding(len(Self.Features) - 1), Self);
             Data["tab"] = NewTab;
+
+            Self.UpdateTabs();
 
             return NewTab;
 
-    def GetWidth(self):
+        Self.UpdateTabs();
+
+    def GetWidth(Self):
         TextWidth, Font = 0, FONT;
         
-        for Feature in self.Features:
+        for Feature in Self.Features:
             TextWidth = max(TextWidth, (Feature["type"] == "label" and Font.width(Feature["text"])) or Font.width(Feature["name"]));
         
         return TextWidth + 20;
 
-    def GetFlag(self, name):
-        for Feature in self.Features:
+    def GetFlag(Self, name):
+        for Feature in Self.Features:
             if (Feature["flag"] == name and Feature["type"] == "toggle"):
                 return Feature;
     
@@ -445,8 +464,8 @@ class Window:
         if (ActiveTab):
             ActiveTab.SetColor(ColorType, Color);
 
-    def Notify(self, Text, Lifetime = 4):
-        self.Notifications.append({ "text": Text, "lifetime": Lifetime, "tick": CLOCK_CLASS.tick() });
+    def Notify(Self, Text, Lifetime = 4):
+        Self.Notifications.append({ "text": Text, "lifetime": Lifetime, "tick": CLOCK_CLASS.tick() });
 
 EVENT_MANAGER = EVENT_MANAGER_CLASS();
 KEYBINDS = KEYBIND_CLASS();
