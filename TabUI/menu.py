@@ -162,12 +162,25 @@ class Window:
         if (ActiveTab):
             ActiveTab.Toggle();
 
-    def AddElement(self, Element, Name, Default = False, Callback = None, Flag = None):
+    def UpdateTabs(Self):
+        Width = Self.GetWidth();
+        PositionX, PositionY = Self.Position.x, Self.Position.y;
+
+        for Index, Feature in enumerate(Self.Features):
+            if (Feature["type"] != "tab"):
+                continue;
+
+            TabWindow = Feature["tab"];
+            
+            TabWindow.Position = Vector2(JavaFloat(PositionX + Width + 2), JavaFloat(PositionY + Self.GetPadding(Index)));
+            TabWindow.UpdateTabs();
+
+    def AddElement(Self, Element, Name, Default = False, Callback = None, Flag = None):
         if (not Flag):
             Flag = Name;
 
         Data = { "name": Name, "type": Element, "enabled": Default, "callback": Callback, "flag": Flag };
-        self.Features.append(Data);
+        Self.Features.append(Data);
         
         if (Element == "label"):
             def UpdateText(txt):
@@ -176,31 +189,37 @@ class Window:
             UpdateText(Name);
             Data["update"] = UpdateText;
 
+            Self.UpdateTabs();
+
             return Data;
         
         if (Element == "tab"):
-            NewTab = Window(self.Position.x + (self.GetWidth() + 2), self.Position.y + self.GetPadding(len(self.Features) - 1), self);
+            NewTab = Window(Self.Position.x + (Self.GetWidth() + 2), Self.Position.y + Self.GetPadding(len(Self.Features) - 1), Self);
             Data["tab"] = NewTab;
+
+            Self.UpdateTabs();
 
             return NewTab;
 
-    def GetWidth(self):
+        Self.UpdateTabs();
+
+    def GetWidth(Self):
         TextWidth, Font = 0, FONT;
         
-        for Feature in self.Features:
+        for Feature in Self.Features:
             TextWidth = max(TextWidth, (Feature["type"] == "label" and Font.width(Feature["text"])) or Font.width(Feature["name"]));
         
         return TextWidth + 20;
 
-    def GetFlag(self, name):
-        for Feature in self.Features:
-            if (Feature["flag"] == name and Feature["type"] == "toggle"):
+    def GetFlag(Self, Name):
+        for Feature in Self.Features:
+            if (Feature["flag"] == Name and Feature["type"] == "toggle"):
                 return Feature;
     
             if (Feature["type"] != "tab"):
                 continue;
     
-            Result = Feature["tab"].GetFlag(name);
+            Result = Feature["tab"].GetFlag(Name);
     
             if (Result):
                 return Result;
@@ -213,15 +232,7 @@ class Window:
             return;
 
         Self.ElementHeight = Height;
-
-        for Index, Feature in enumerate(Self.Features):
-            if (Feature["type"] != "tab"):
-                continue;
-
-            TabWindow = Feature["tab"];
-            
-            TabWindow.Position = Vector2(Self.Position.x + (Self.GetWidth() + 2), Self.Position.y + (Index * Height));
-            TabWindow.SetScale(Height);
+        Self.UpdateTabs();
 
     def SetColor(Self, ColorType, Color):
         if (ColorType not in Self.Colors):
@@ -233,5 +244,5 @@ class Window:
         if (ActiveTab):
             ActiveTab.SetColor(ColorType, Color);
 
-    def Notify(self, Text, Lifetime = 4):
-        self.Notifications.append({ "text": Text, "lifetime": Lifetime, "tick": CLOCK_CLASS.tick() });
+    def Notify(Self, Text, Lifetime = 4):
+        Self.Notifications.append({ "text": Text, "lifetime": Lifetime, "tick": CLOCK_CLASS.tick() });
