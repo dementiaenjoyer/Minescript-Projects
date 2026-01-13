@@ -374,8 +374,11 @@ class Window:
         if (ActiveTab):
             ActiveTab.Toggle();
 
-    def AddElement(self, Element, Name, Default = False, Callback = None):
-        Data = { "name": Name, "type": Element, "enabled": Default, "callback": Callback };
+    def AddElement(self, Element, Name, Default = False, Callback = None, Flag = None):
+        if (not Flag):
+            Flag = Name;
+
+        Data = { "name": Name, "type": Element, "enabled": Default, "callback": Callback, "flag": Flag };
         self.Features.append(Data);
         
         if (Element == "label"):
@@ -403,7 +406,7 @@ class Window:
 
     def GetFlag(self, name):
         for Feature in self.Features:
-            if (Feature["name"] == name and Feature["type"] == "toggle"):
+            if (Feature["flag"] == name and Feature["type"] == "toggle"):
                 return Feature;
     
             if (Feature["type"] != "tab"):
