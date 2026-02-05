@@ -20,7 +20,7 @@ class EVENT_MANAGER_CLASS:
 
 class KEYBIND_CLASS: # i made this because add_event_listener causes INSANE amounts of fps drops. my 1k fps would get to as low as 250 fps from ONLY using add_event_listener on another project, dis works good though!
     def __init__(Self):
-        Self.Previous = {};
+        Self.Previous = { };
         Self.Events = { };
         Self.Keys = {
             "MB1": 0,
@@ -171,4 +171,5 @@ def HUD_RENDER(DrawContext, _):
         Callback(DrawContext);
 
 HudRenderCallback.EVENT.register(HudRenderCallback(ManagedCallback(HUD_RENDER)));
+
 WorldRenderEvents.LAST.register(WorldRenderLast(KEYBINDS.OnUpdate));
